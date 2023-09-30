@@ -4,12 +4,23 @@ import { HttpService } from '@nestjs/axios';
 import { map, retryWhen, delay, mergeMap } from 'rxjs/operators';
 import { of, throwError, Observable } from 'rxjs';
 
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { GPT3Response, GPT3ResponseDocument } from './mongodb/gpt3.schema';
+
 @Injectable()
 export class AppService {
   constructor(
+    @InjectModel(GPT3Response.name)
+    private gpt3ResponseModel: Model<GPT3ResponseDocument>,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {}
+
+  async saveResponseToDb(response: any) {
+    const createdResponse = new this.gpt3ResponseModel(response);
+    return await createdResponse.save();
+  }
 
   fetchGPT3Response(prompt: string): Observable<any> {
     const url =
@@ -27,7 +38,10 @@ export class AppService {
     };
 
     return this.httpService.post(url, data, { headers }).pipe(
-      map((response) => response.data),
+      map((response) => {
+        this.saveResponseToDb(response.data);
+        response.data;
+      }),
       retryWhen((errors) =>
         errors.pipe(
           // log error message
