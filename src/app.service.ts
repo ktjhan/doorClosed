@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
-import { map, retryWhen, delay, mergeMap } from 'rxjs/operators';
+import { map, retryWhen, mergeMap, delay } from 'rxjs/operators';
 import { of, throwError, Observable } from 'rxjs';
 
 import { InjectModel } from '@nestjs/mongoose';
@@ -32,7 +32,7 @@ export class AppService {
     };
 
     const data = {
-      prompt: prompt,
+      prompt: 'What is the capital of Uzbekistan?',
       max_tokens: 1000,
       temperature: 0.1,
     };
@@ -40,7 +40,9 @@ export class AppService {
     return this.httpService.post(url, data, { headers }).pipe(
       map((response) => {
         this.saveResponseToDb(response.data);
-        response.data;
+
+        console.log(response.data);
+        return response.data;
       }),
       retryWhen((errors) =>
         errors.pipe(

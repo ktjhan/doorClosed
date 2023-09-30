@@ -14,7 +14,9 @@ import { GPT3Response, GPT3ResponseSchema } from './mongodb/gpt3.schema';
     MongooseModule.forRoot(
       'mongodb+srv://ktjhan:swordfish@cluster0.rx0qtgn.mongodb.net/?retryWrites=true&w=majority',
     ),
-    MongooseModule.forFeature([{ name: 'response', schema: GPT3ResponseModel }])
+    MongooseModule.forFeature([
+      { name: GPT3Response.name, schema: GPT3ResponseSchema },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],
