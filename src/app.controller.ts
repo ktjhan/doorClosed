@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
+// import { Observable } from 'rxjs';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('fetch-gpt')
+  async fetchGPT(@Query('prompt') prompt: string) {
+    return await this.appService.fetchGPT3Response(prompt);
   }
 }
