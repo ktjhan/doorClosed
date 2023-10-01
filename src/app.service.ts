@@ -17,8 +17,10 @@ export class AppService {
     private readonly configService: ConfigService,
   ) {}
 
-  async saveResponseToDb(response: any) {
-    const createdResponse = new this.gpt3ResponseModel(response);
+  async saveResponseToDb(prompt: string, response: string) {
+    console.log('Saving Prompt: ', prompt);
+    console.log('Saving Response: ', response.trim());
+    const createdResponse = new this.gpt3ResponseModel({ prompt, response });
     return await createdResponse.save();
   }
 
@@ -32,17 +34,15 @@ export class AppService {
     };
 
     const data = {
-      prompt: 'What is the capital of Uzbekistan?',
+      prompt: prompt,
       max_tokens: 1000,
       temperature: 0.1,
     };
 
     return this.httpService.post(url, data, { headers }).pipe(
       map((response) => {
-        this.saveResponseToDb(response.data);
-
-        console.log(response.data);
-        return response.data;
+        this.saveResponseToDb(prompt, response.data.choices[0].text.trim());
+        return response.data.choices[0].text.trim();
       }),
       retryWhen((errors) =>
         errors.pipe(

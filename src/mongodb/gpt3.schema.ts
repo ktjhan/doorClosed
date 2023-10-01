@@ -12,10 +12,10 @@ export class GPT3Response {
   })
   _id: string;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   prompt: string;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   response: string;
 }
 
